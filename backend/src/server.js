@@ -15,8 +15,21 @@ import assignmentRoutes from './routes/assignmentRoutes.js';
 import expenditureRoutes from './routes/expenditureRoutes.js';
 import baseRoutes from './routes/baseRoutes.js';
 import auditLogRoutes from './routes/auditLogRoutes.js';
+import db from './config/database.js';
+import { runSeed } from './db/seed.js';
 
 dotenv.config();
+
+// Auto-seed if database is fresh / empty
+try {
+  const tableCheck = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").get();
+  if (!tableCheck) {
+    console.log('[Startup] Empty database detected. Running seed initialization...');
+    runSeed();
+  }
+} catch (err) {
+  console.warn('[Startup] Database initialization check warning:', err.message);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
