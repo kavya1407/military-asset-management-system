@@ -25,3 +25,8 @@ yarn-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Local submission helpers & archives (kept locally, excluded from public repo)
+VIDEO_WALKTHROUGH_SCRIPT.md
+DEPLOYMENT_GUIDE.md
+*.zip
