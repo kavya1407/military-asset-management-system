@@ -2,7 +2,15 @@ import { mockStore } from './mockStore';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
-let isMockMode = false;
+// Detect if running on static preview hosting without an explicit backend URL
+const isStaticPreview = typeof window !== 'undefined' && (
+  !import.meta.env.VITE_API_URL && (
+    window.location.hostname.includes('vercel.app') ||
+    window.location.hostname.includes('github.io')
+  )
+);
+
+let isMockMode = isStaticPreview || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('vanguard_mock_mode') === 'true');
 
 /**
  * Custom fetch wrapper with automatic JWT injection, error handling,
@@ -29,11 +37,12 @@ async function request(endpoint, options = {}, mockFallback) {
     const contentType = response.headers.get('content-type') || '';
     const isHtml = contentType.includes('text/html');
 
-    // If endpoint doesn't exist on static host (404), or server error (502, 503), or returned HTML index fallback
-    if (response.status === 404 || response.status === 502 || response.status === 503 || (response.status >= 400 && isHtml)) {
+    // If server returned HTML (Vercel rewrite fallback to index.html) or error status
+    if (isHtml || response.status === 404 || response.status >= 500) {
       if (mockFallback) {
-        console.info(`[MAMS Vanguard] Backend offline or returned ${response.status}. Operating in local resilient store mode.`);
+        console.info(`[MAMS Vanguard] Response is HTML or offline (${response.status}). Engaging tactical local store.`);
         isMockMode = true;
+        try { sessionStorage.setItem('vanguard_mock_mode', 'true'); } catch {}
         return await mockFallback();
       }
     }
@@ -44,10 +53,15 @@ async function request(endpoint, options = {}, mockFallback) {
       window.dispatchEvent(new Event('auth:unauthorized'));
     }
 
-    const data = await response.json().catch(() => ({ success: false, message: 'Server error' }));
+    const data = await response.json().catch(() => null);
 
-    if (!response.ok) {
-      throw new Error(data.message || `Request failed with status ${response.status}`);
+    if (!data || !response.ok) {
+      if (mockFallback) {
+        isMockMode = true;
+        try { sessionStorage.setItem('vanguard_mock_mode', 'true'); } catch {}
+        return await mockFallback();
+      }
+      throw new Error(data?.message || `Request failed with status ${response.status}`);
     }
 
     return data;
@@ -55,6 +69,7 @@ async function request(endpoint, options = {}, mockFallback) {
     if (mockFallback) {
       console.info(`[MAMS Vanguard] Fetch failed (${err.message}). Seamlessly engaging mockStore fallback.`);
       isMockMode = true;
+      try { sessionStorage.setItem('vanguard_mock_mode', 'true'); } catch {}
       return await mockFallback();
     }
     throw err;

@@ -117,8 +117,8 @@ export const mockStore = {
   }),
 
   getDashboardMetrics: async (params = {}) => {
-    const baseId = params.baseId ? Number(params.baseId) : null;
-    const eqId = params.equipmentTypeId ? Number(params.equipmentTypeId) : null;
+    const baseId = params.baseId && params.baseId !== 'all' ? Number(params.baseId) : null;
+    const eqId = params.equipmentTypeId && params.equipmentTypeId !== 'all' ? Number(params.equipmentTypeId) : null;
 
     // Filter purchases
     const winPurchases = purchases.filter(p => {
@@ -194,7 +194,7 @@ export const mockStore = {
   },
 
   getNetMovementDetails: async (params = {}) => {
-    const baseId = params.baseId ? Number(params.baseId) : null;
+    const baseId = params.baseId && params.baseId !== 'all' ? Number(params.baseId) : null;
     const pList = purchases.filter(p => !baseId || p.base_id === baseId);
     const inList = transfers.filter(t => t.status === 'COMPLETED' && (!baseId || t.destination_base_id === baseId));
     const outList = transfers.filter(t => t.status === 'COMPLETED' && (!baseId || t.origin_base_id === baseId));
@@ -224,14 +224,15 @@ export const mockStore = {
   },
 
   getCategoryDistribution: async (baseId) => {
+    const bId = baseId && baseId !== 'all' ? Number(baseId) : null;
     return {
       success: true,
       distribution: [
-        { category: 'Ammunition', item_count: 2, initial_total: 2350 },
-        { category: 'Weapons', item_count: 3, initial_total: 1530 },
-        { category: 'Medical & Field Gear', item_count: 2, initial_total: 1255 },
-        { category: 'Communications', item_count: 2, initial_total: 480 },
-        { category: 'Vehicles', item_count: 3, initial_total: 280 }
+        { category: 'Ammunition', item_count: 2, initial_total: bId ? 1100 : 2350 },
+        { category: 'Weapons', item_count: 3, initial_total: bId ? 750 : 1530 },
+        { category: 'Medical & Field Gear', item_count: 2, initial_total: bId ? 420 : 1255 },
+        { category: 'Communications', item_count: 2, initial_total: bId ? 180 : 480 },
+        { category: 'Vehicles', item_count: 3, initial_total: bId ? 80 : 280 }
       ]
     };
   },
