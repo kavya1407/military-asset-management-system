@@ -1,16 +1,8 @@
 import { mockStore } from './mockStore';
 
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://military-asset-management-system-9ktr.onrender.com/api';
 
-// Detect if running on static preview hosting without an explicit backend URL
-const isStaticPreview = typeof window !== 'undefined' && (
-  !import.meta.env.VITE_API_URL && (
-    window.location.hostname.includes('vercel.app') ||
-    window.location.hostname.includes('github.io')
-  )
-);
-
-let isMockMode = isStaticPreview || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('vanguard_mock_mode') === 'true');
+let isMockMode = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('vanguard_mock_mode') === 'true';
 
 /**
  * Custom fetch wrapper with automatic JWT injection, error handling,
