@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production builds (kept in zip, ignore unneeded artifacts)
+dist_archive_stage/
+staging_zip/
+
+# Environment files
+.env
+.env.local
+
+# SQLite temporary WAL files
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

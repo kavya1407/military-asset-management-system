@@ -1,0 +1,28 @@
+{
+  "name": "military-asset-management-system",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Tactical Military Asset Management System (MAMS) - Multi-Base Logistics, RBAC, Inventory Accounting & Non-Repudiation Audit Trail",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "seed": "node backend/src/db/seed.js",
+    "export-dump": "node backend/src/db/exportDump.js",
+    "build:frontend": "npm run --prefix frontend build",
+    "dev:backend": "npm run --prefix backend dev",
+    "dev:frontend": "npm run --prefix frontend dev",
+    "package": "node scripts/createArchive.js",
+    "generate:pdf": "node scripts/generatePdf.js"
+  },
+  "keywords": [
+    "military-logistics",
+    "asset-management",
+    "inventory-accounting",
+    "rbac",
+    "audit-logging"
+  ],
+  "author": "Vanguard Defense Logistics Team",
+  "license": "MIT",
+  "dependencies": {
+    "pdfkit": "^0.20.2"
+  }
+}
